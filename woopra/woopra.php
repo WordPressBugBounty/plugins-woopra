@@ -17,7 +17,7 @@
  * pretty PHP class format. 
  * 
  * @author Elie Khoury <elie@woopra.com>
- * @version 3.2
+ * @version 3.3.2
  * @copyright 2020
  * @package woopra
  */
@@ -27,7 +27,7 @@
  * @since 1.4.1
  * @return none
  */
-DEFINE ('WOOPRA_VERSION', '3.2');   // MAKE SURE THIS MATCHES THE VERSION ABOVE!!!!
+DEFINE ('WOOPRA_VERSION', '3.3.2');   // MAKE SURE THIS MATCHES THE VERSION ABOVE!!!!
 
 /*
 
@@ -35,7 +35,7 @@ DEFINE ('WOOPRA_VERSION', '3.2');   // MAKE SURE THIS MATCHES THE VERSION ABOVE!
 
 Plugin Name:  Woopra
 Plugin URI:   https://wordpress.org/plugins/woopra/
-Version:      3.2
+Version:      3.3.2
 Description:  Track who is on your website, what pages they're browsing, actions they're taking, articles they're reading and more.
 Author:       <a href="https://www.woopra.com">Elie Khoury</a>
 Author URI:   https://www.woopra.com/

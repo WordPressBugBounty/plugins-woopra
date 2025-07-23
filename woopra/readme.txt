@@ -3,8 +3,9 @@ Contributors: eliekhoury, markjaquith, ShaneF, airisrd
 Web site: http://www.woopra.com
 Tags: statistics, analytics, stats, real-time, funnels, track visitors
 Requires at least: 2.7.0
-Tested up to: 6.5.2
-Stable tag: 3.2
+Tested up to: 6.8.2
+Requires PHP: 7.4
+Stable tag: 3.3.2
 
 Track who is on your website, what pages they're browsing, actions they're taking, articles they're reading and more.
 
@@ -70,6 +71,12 @@ Simply install the Woopra plugin and activate it. You’ll instantly begin seein
 Make sure that the plugin is active. If it's active and the code is not showing up on your pages (between `<head>` and `</head>`), make sure your theme supports/contains the `<?php wp_head(); ?>` hook.
 
 == Changelog ==
+
+= 3.3.2 (07-23-25)
+* [FIX] Fix compatibility issues
+
+= 3.3 (07-23-25)
+* [FIX] Fix compatibility issues
 
 = 3.2 (07-23-25)
 * [FIX] Fix compatibility issues
