@@ -25,6 +25,13 @@ class WoopraEvents extends WoopraFrontend {
 	var $default_events;
 	
 	/**
+	 * Woopra's Built in WooCommerce Events.
+	 * @since 3.2
+	 * @var array
+	 */
+	var $default_woocommerce_events;
+	
+	/**
 	 * What are the current event's going on?
 	 * @since 1.4.1
 	 * @var object
@@ -76,20 +83,22 @@ class WoopraEvents extends WoopraFrontend {
 		 * setting*** - If the 'action' or 'filter' have duplicities, they must have unique setting names.
 		 * 
 		 */
+		
+		// Define events without translations first
 		$default_events = array(
 			array(
-				'name'		=>	__('comments', 'woopra'),
-				'label'		=>	__('Show comments as they are posted.', 'woopra'),
+				'name'		=>	'comments',
+				'label'		=>	'Show comments as they are posted.',
 				'action'	=>	'comment_post',
 			),
 			array(
-				'name'		=>	__('search', 'woopra'),
-				'label'		=>	__('Show users search queries.', 'woopra'),
+				'name'		=>	'search',
+				'label'		=>	'Show users search queries.',
 				'action'	=>	'search_query',
 			),
 			array(
-				'name'		=>	__('signup', 'woopra'),
-				'label'		=>	__('Show users sign up.', 'woopra'),
+				'name'		=>	'signup',
+				'label'		=>	'Show users sign up.',
 				'action'	=>	'signup',
 			)
 		);
@@ -98,26 +107,50 @@ class WoopraEvents extends WoopraFrontend {
 
 		$default_woocommerce_events = array(
 			array(
-				'name'		=>	__('cart update', 'woopra'),
-				'label'		=>	__('Show cart updates.', 'woopra'),
+				'name'		=>	'cart update',
+				'label'		=>	'Show cart updates.',
 				'action'	=>	'cart',
 			),
 			array(
-				'name'		=>	__('checkout', 'woopra'),
-				'label'		=>	__('Show users checkouts.', 'woopra'),
+				'name'		=>	'checkout',
+				'label'		=>	'Show users checkouts.',
 				'action'	=>	'checkout',
 			),
 			array(
-				'name'		=>	__('coupon', 'woopra'),
-				'label'		=>	__('Track coupons applied.', 'woopra'),
+				'name'		=>	'coupon',
+				'label'		=>	'Track coupons applied.',
 				'action'	=>	'coupon',
 			)
 		);
 
 		$this->default_woocommerce_events = $default_woocommerce_events;
+		
+		// Apply translations after init
+		add_action('init', array($this, 'translate_event_strings'), 15);
+	}
+	
+	/**
+	 * Translate event strings after text domain is loaded
+	 * @since 3.2
+	 * @return void
+	 */
+	function translate_event_strings() {
+		// Apply translations to default events
+		if (is_array($this->default_events)) {
+			foreach ($this->default_events as $key => $event) {
+				$this->default_events[$key]['name'] = __($event['name'], 'woopra');
+				$this->default_events[$key]['label'] = __($event['label'], 'woopra');
+			}
+		}
+		
+		// Apply translations to WooCommerce events
+		if (is_array($this->default_woocommerce_events)) {
+			foreach ($this->default_woocommerce_events as $key => $event) {
+				$this->default_woocommerce_events[$key]['name'] = __($event['name'], 'woopra');
+				$this->default_woocommerce_events[$key]['label'] = __($event['label'], 'woopra');
+			}
+		}
 	}
 	
 
 }
-
-?>

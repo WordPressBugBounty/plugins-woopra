@@ -20,6 +20,7 @@ class WoopraTracker {
 	* ping (boolean) - Ping woopra servers to ensure that the visitor is still on the webpage?
 	* ping_interval (integer) - Time interval in milliseconds between each ping
 	* idle_timeout (integer) - Idle time after which the user is considered offline
+	* click_tracking (boolean) - Track clicks on the web page
 	* download_tracking (boolean) - Track downloads on the web page
 	* outgoing_tracking (boolean) - Track external links clicks on the web page
 	* download_pause (integer) - Time in millisecond to pause the browser to ensure that the event is tracked when visitor clicks on a download url
@@ -38,6 +39,7 @@ class WoopraTracker {
 		"ping" => true,
 		"ping_interval" => 12000,
 		"idle_timeout" => 300000,
+		"click_tracking" => true,
 		"download_tracking" => true,
 		"outgoing_tracking" => true,
 		"download_pause" => 200,

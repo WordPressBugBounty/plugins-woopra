@@ -24,6 +24,13 @@ class WoopraAdmin extends Woopra {
 	 * @var array
 	 */
 	var $_events;
+	
+	/**
+	 * All the WooCommerce events.
+	 * @since 3.2
+	 * @var array
+	 */
+	var $_woocommerce_events;
 
 	/**
 	 * The plugin file.
@@ -56,29 +63,39 @@ class WoopraAdmin extends Woopra {
 		$this->plugin_file = dirname( dirname ( __FILE__ ) ) . '/woopra.php';
 		$this->plugin_basename = plugin_basename( $this->plugin_file );
 		
-		//	Load Transations File
-		load_plugin_textdomain( 'woopra', false, '/woopra/locale' );
+		//	Hook text domain loading to the init action
+		add_action( 'init', array($this, 'load_textdomain') );
 
 		//	Run this when installed or upgraded.
-		register_activation_hook( $this->plugin_file,	array(&$this, 'init') 				);
-		register_deactivation_hook( $this->plugin_file, array(&$this, 'init_deactivate')	);
+		register_activation_hook( $this->plugin_file,	array($this, 'init') 				);
+		register_deactivation_hook( $this->plugin_file, array($this, 'init_deactivate')	);
 		
 		//	Only run if activated!
 		if ($this->get_option('activated')) {
 			//	Admin Actions
-			add_action( 'admin_enqueue_scripts', 		array(&$this, 'enqueue' ) 							);
-			add_action(	'admin_menu', 					array(&$this, 'woopra_add_menu') 					);
+			add_action( 'admin_enqueue_scripts', 		array($this, 'enqueue' ) 							);
+			add_action(	'admin_menu', 					array($this, 'woopra_add_menu') 					);
 			
 			//	AJAX Render
-			add_action(	'wp_ajax_woopra',				array(&$this, 'render_page' ) 						);
+			add_action(	'wp_ajax_woopra',				array($this, 'render_page' ) 						);
 		}
 
-		add_action( 'admin_menu',					array(&$this, 'register_settings_page') 			);
-		add_action( 'admin_init',					array(&$this, 'admin_init' ) 						);
+		add_action( 'admin_menu',					array($this, 'register_settings_page') 			);
+		add_action( 'admin_init',					array($this, 'admin_init' ) 						);
 		
 		//	Process Events
 		$this->event = new WoopraEvents();
 				
+	}
+	
+	/**
+	 * Load plugin text domain for translations
+	 * @since 3.2
+	 * @return none
+	 */
+	function load_textdomain() {
+		//	Load Translations File
+		load_plugin_textdomain( 'woopra', false, '/woopra/locale' );
 	}
 	
 	/*** MAIN FUNCTIONS ***/
@@ -130,8 +147,8 @@ class WoopraAdmin extends Woopra {
 	 * @return none
 	 */
 	function register_settings_page() {
-		add_options_page( __('Woopra', 'woopra'), __("Woopra", 'woopra'), 'manage_options', 'woopra', array(&$this, 'settings_page') );
-		add_filter ( "plugin_action_links_{$this->plugin_basename}" , array ( &$this , 'filter_plugin_actions' ) );	
+		add_options_page( __('Woopra', 'woopra'), __("Woopra", 'woopra'), 'manage_options', 'woopra', array($this, 'settings_page') );
+		add_filter ( "plugin_action_links_{$this->plugin_basename}" , array ( $this , 'filter_plugin_actions' ) );	
 	}
 	
 	/**
@@ -155,9 +172,9 @@ class WoopraAdmin extends Woopra {
 		
 		if (false && function_exists('add_menu_page')) {
 			if ($this->get_option('analytics_tab') && $this->get_option('analytics_tab') ==	'toplevel') {
-				add_menu_page(__("Woopra Analytics", 'woopra'), __("Woopra Analytics", 'woopra'), "manage_options", "woopra.php", array(&$this, 'content_page') ); 
+				add_menu_page(__("Woopra Analytics", 'woopra'), __("Woopra Analytics", 'woopra'), "manage_options", "woopra.php", array($this, 'content_page') ); 
 			} else {
-				add_submenu_page('index.php', __("Woopra Analytics", 'woopra'), __("Woopra Analytics", 'woopra'), 'manage_options', "woopra-analytics", array(&$this, 'content_page') );
+				add_submenu_page('index.php', __("Woopra Analytics", 'woopra'), __("Woopra Analytics", 'woopra'), 'manage_options', "woopra-analytics", array($this, 'content_page') );
 			}
 		}
 	}
@@ -168,7 +185,7 @@ class WoopraAdmin extends Woopra {
 	 * @return none
 	 */
 	function admin_init () {
-		register_setting( 'woopra', 'woopra', array(&$this , 'update') );
+		register_setting( 'woopra', 'woopra', array($this , 'update') );
 	}
 	
 	/**
@@ -346,9 +363,9 @@ class WoopraAdmin extends Woopra {
             'track_article'		=> 1,
 			'ignore_admin'		=> 0,
 			'track_admin'		=> 0,
-			'track_clicks' => 1,
-			'track_downloads' => 1,
-			'track_outgoing' => 1,
+			'track_clicks' 		=> 1,
+			'track_downloads' 	=> 1,
+			'track_outgoing' 	=> 1,
 			'use_timeout'		=> 0,
 			'process_event'		=> 1,
 			'timeout'			=> 600,
@@ -412,7 +429,6 @@ class WoopraAdmin extends Woopra {
 	
 	<input type="button" style="font-size: 16px;width: 300px;height: 42px;float: right;margin-top: 20px;margin-right: 10px;" onclick="window.open('https://app.woopra.com/')" class="button-primary" value="<?php _e('Launch Woopra', 'woopra') ?>" />
 	
-<?php screen_icon(); ?>
 	<h2><?php _e( 'Woopra Settings', 'woopra' ); ?></h2>
 	<p><?php _e('For more info about installation and customization, please visit <a href="https://docs.woopra.com/">our docs</a>', 'woopra') ?></p>
 	
@@ -630,4 +646,3 @@ class WoopraAdmin extends Woopra {
     }
     
 }
-?>

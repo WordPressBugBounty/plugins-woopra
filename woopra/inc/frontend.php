@@ -1,5 +1,4 @@
 <?php
-error_reporting();
 /**
  * WoopraFrontend Class for Woopra
  * This class contains all functions and actions required for Woopra to track Wordpress events and outputs the frontend code.
@@ -9,6 +8,10 @@ class WoopraFrontend extends Woopra {
 	var $user;
 	
 	var $config;
+	
+	var $woopra;
+	
+	var $events;
 	
 	function __construct() {		
 		
@@ -27,7 +30,7 @@ class WoopraFrontend extends Woopra {
 		
 		//Detect Wordpress user
 		$this->user = array();
-		add_action('init', array(&$this, 'woopra_detect'));
+		add_action('init', array($this, 'woopra_detect'));
 		
 		//If event tracking is turned on, process events
 		if ($this->get_option('process_event')) {
@@ -36,12 +39,12 @@ class WoopraFrontend extends Woopra {
 		}
 		
 		if ($this->get_option('other_events')) {
-			add_action("woopra_identify", array(&$this->woopra, "identify"), 10, 3);
-			add_action("woopra_track", array(&$this->woopra, "track"), 10, 3);
+			add_action("woopra_identify", array($this->woopra, "identify"), 10, 3);
+			add_action("woopra_track", array($this->woopra, "track"), 10, 3);
 		}
 		
 		//Register front-end tracking
-		add_action('init', array(&$this, 'set_tracker'));
+		add_action('init', array($this, 'set_tracker'));
 		
 	}
 	
@@ -61,10 +64,10 @@ class WoopraFrontend extends Woopra {
 						}
 		 			break;
 		 			case "comment_post":
-		 				add_action('comment_post', array(&$this, 'track_comment'), 10, 1);
+		 				add_action('comment_post', array($this, 'track_comment'), 10, 1);
 		 			break;
 		 			case "signup":
-		 				add_action('user_register', array(&$this, 'track_signup'), 10, 1);
+		 				add_action('user_register', array($this, 'track_signup'), 10, 1);
 		 			break;
 		 		}
 	 		}
@@ -82,17 +85,17 @@ class WoopraFrontend extends Woopra {
 	 		if (isset($event_status[$data['action']]) && ($event_status[$data['action']] == 1)) {
 		 		switch($data['action']) {
 		 			case "cart":
-		 				add_action('woocommerce_cart_loaded_from_session', array(&$this, 'initialize_cart_quantities'));
-		 				add_action('woocommerce_after_cart_item_quantity_update', array(&$this, 'track_cart_quantity'));
-		 				add_action('woocommerce_before_cart_item_quantity_zero', array(&$this, 'track_cart_quantity_zero'));
-		 				add_action('woocommerce_add_to_cart', array(&$this, 'track_cart_add'), 2, 6);
-		 				add_action('woocommerce_cart_item_removed', array(&$this, 'track_cart_remove'));
+		 				add_action('woocommerce_cart_loaded_from_session', array($this, 'initialize_cart_quantities'));
+		 				add_action('woocommerce_after_cart_item_quantity_update', array($this, 'track_cart_quantity'));
+		 				add_action('woocommerce_before_cart_item_quantity_zero', array($this, 'track_cart_quantity_zero'));
+		 				add_action('woocommerce_add_to_cart', array($this, 'track_cart_add'), 2, 6);
+		 				add_action('woocommerce_cart_item_removed', array($this, 'track_cart_remove'));
 		 			break;
 		 			case "checkout":
-		 				add_action('woocommerce_checkout_order_processed', array(&$this, 'track_checkout'), 10, 2);
+		 				add_action('woocommerce_checkout_order_processed', array($this, 'track_checkout'), 10, 2);
 		 			break;
 		 			case "coupon":
-		 				add_action('woocommerce_applied_coupon', array(&$this, 'track_coupon'));
+		 				add_action('woocommerce_applied_coupon', array($this, 'track_coupon'));
 		 			break;
 		 		}
 	 		}
@@ -349,10 +352,10 @@ class WoopraFrontend extends Woopra {
 	        global $post;
 	        $myvar = get_the_category($post->ID);
 	        $myvar = $myvar[0]->cat_name;
-			$page_data["author"] = js_escape(get_the_author_meta("display_name",$post->post_author));
-			$page_data["category"] = isset($myvar) ? js_escape($myvar) : "Uncategorized";
-			$page_data["permalink"] = js_escape(get_the_permalink());
-			$page_data["title"] = js_escape(get_the_title());
+			$page_data["author"] = esc_js(get_the_author_meta("display_name",$post->post_author));
+			$page_data["category"] = isset($myvar) ? esc_js($myvar) : "Uncategorized";
+			$page_data["permalink"] = esc_js(get_the_permalink());
+			$page_data["title"] = esc_js(get_the_title());
 			$page_data["post date"] = get_the_time('U')*1000;
 			$this->woopra->track("wp article", $page_data)->js_code();
 		} else {
@@ -368,22 +371,19 @@ class WoopraFrontend extends Woopra {
 		global $post;
 		if (current_user_can('manage_options') && $this->get_option('ignore_admin') == 0) {
 			if($this->get_option('track_admin') == 1) {
-				add_action('admin_head', array(&$this, 'track'), 10);
+				add_action('admin_head', array($this, 'track'), 10);
 			}
-			add_action('wp_head', array(&$this, 'track'), 10);
+			add_action('wp_head', array($this, 'track'), 10);
 		} elseif(!current_user_can('manage_options')) {
-			add_action('wp_head', array(&$this, 'track'), 10);
+			add_action('wp_head', array($this, 'track'), 10);
 		}
 	}
-	
-	
-		
+
 	/**
 	* Loads Woopra configuration
 	* @return none
 	*/
 	function woopra_config() {
-		
 		if ($this->get_option('trackas')) {
 			$this->config["domain"] = $this->get_option('trackas');
 		}
@@ -396,6 +396,4 @@ class WoopraFrontend extends Woopra {
 		$this->config["hide_campaign"] = $this->get_option('hide_campaign') == 1 ? true : false;
 		$this->config["app"] = "wordpress";
 	}
-	
 }
-?>
